@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  slack: circleci/slack@4.5.1
+
 jobs:
   build-frontend:
     docker:
@@ -88,6 +91,27 @@ jobs:
             npm install
             npm audit fix --audit-level=critical
             npm audit --audit-level=critical
+  notify:
+    docker:
+      - image: "cimg/base:stable"
+    steps:
+      - slack/notify:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "*This is a text notification*",
+                      "emoji": true
+                    }
+                  ]
+                }
+              ]
+            }
+          event: always
 workflows:
   defaults:
     jobs:
@@ -101,3 +125,5 @@ workflows:
           requires: [build-frontend]
       - scan-backend:
           requires: [build-backend]
+      - notify:
+          context: slack-secrets
