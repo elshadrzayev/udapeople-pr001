@@ -223,4 +223,4 @@ workflows:
       #     requires: [deploy-infrastructure]
       # - run-migrations
       #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      - run-nonmigrations:
+      - run-nonmigrations
