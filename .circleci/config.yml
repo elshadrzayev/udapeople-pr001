@@ -199,10 +199,8 @@ jobs:
   run-nonmigrations:
     docker:
       - image: alpine:latest
-      - image: circleci/node:13.8.0
     steps:
-      - checkout
-      - run: apl add --update curl
+      - run: apk add --update curl
       - run:
           name: Send migration results to memstash
           command: |
