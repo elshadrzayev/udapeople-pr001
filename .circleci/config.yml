@@ -248,7 +248,7 @@ jobs:
           name: Install dependencies
           command: |
             curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
-            yum install nodejs
+            sudo yum install nodejs
       - attach_workspace:
           at: ~/
       - run:
