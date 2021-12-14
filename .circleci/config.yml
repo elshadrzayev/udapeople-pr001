@@ -158,7 +158,7 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - .circleci/ansible/inventory.txt
+            - udapeople-pr001/.circleci/ansible/inventory.txt
       - destroy_environment
   configure-infrastructure:
     docker:
@@ -191,6 +191,6 @@ workflows:
       #     requires: [build-frontend]
       # - scan-backend:
       #     requires: [build-backend]
-      - deploy-infrastructure
+      # - deploy-infrastructure
       - configure-infrastructure:
           requires: [deploy-infrastructure]
