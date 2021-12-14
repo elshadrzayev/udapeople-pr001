@@ -181,7 +181,6 @@ jobs:
   run-migrations:
     docker:
       - image: circleci/node:13.8.0
-      - image: alpine:latest
     steps:
       - checkout
       - run:
@@ -190,7 +189,6 @@ jobs:
             cd backend
             npm install
             npm run migrations > migrations_dump.txt
-      - run: apk add --update curl
       - run:
           name: Send migration results to memstash
           command: |
@@ -198,6 +196,7 @@ jobs:
             then
               curl -H "Content-Type: text/plain" -H "token: 9b73b50c-1f51-493a-b1c4-8e82697e4f62" --request PUT --data "1" https://api.memstash.io/values/migrations_${CIRCLE_WORKFLOW_ID:0:7}
             fi
+workflows:
   defaults:
     jobs:
       # - build-frontend
