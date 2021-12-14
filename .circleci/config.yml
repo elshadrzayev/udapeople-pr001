@@ -3,7 +3,6 @@ version: 2.1
 orbs:
   slack: circleci/slack@4.5.1
   aws-cli: circleci/aws-cli@2.0
-  github-release: haskell-works/github-release@1.3.3
 
 commands:
   notify_slack_error:
@@ -193,5 +192,5 @@ workflows:
       # - scan-backend:
       #     requires: [build-backend]
       - deploy-infrastructure
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
