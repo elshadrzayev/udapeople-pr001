@@ -184,7 +184,9 @@ jobs:
       - image: alpine:latest
     steps:
       - checkout
-      - run: apk add --update curl
+      - run:
+          command: |
+            apk add --update curl
       - run:
           name: Run migrations
           command: |
