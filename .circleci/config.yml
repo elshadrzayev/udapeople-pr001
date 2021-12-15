@@ -178,7 +178,7 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy_environment:
+      - destroy_environment
 
   configure-infrastructure:
     docker:
@@ -197,7 +197,7 @@ jobs:
           name: Configure server
           command: |
             cd .circleci/ansible ansible-playbook -i inventory.txt configure-server.yml
-      - destroy_environment:
+      - destroy_environment
 
   run-migrations:
     docker:
@@ -246,7 +246,7 @@ jobs:
           root: ~/project
           paths:
             - backend
-      - destroy_environment:
+      - destroy_environment
 
   deploy-frontend:
     docker:
@@ -281,7 +281,7 @@ jobs:
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       # Here's where you will add some code to rollback on failure
-      - destroy_environment:
+      - destroy_environment
   deploy-backend:
     docker:
       - image: python:3.7-alpine3.11
@@ -314,7 +314,7 @@ jobs:
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
-      - destroy_environment:
+      - destroy_environment
 
       # Here's where you will add some code to rollback on failure
 workflows:
