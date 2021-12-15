@@ -18,10 +18,6 @@ commands:
           template: basic_success_1
 
   destroy_environment:
-    description: Destroy backend and frontend cloudformation stacks given a workflow ID.
-    # parameters:
-    #   workflow_id:
-    #     type: string
     steps:
       - run:
           name: Destroy environments
@@ -88,7 +84,6 @@ jobs:
           key: frontend-test
       - notify_slack_error
       - notify_slack_pass
-
   test-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -294,10 +289,18 @@ jobs:
       - run:
           name: Install dependencies
           command: |
+            apk add --no-cache \
+            python3 \
+            py3-pip \
+            && pip3 install --upgrade pip \
+            && pip3 install \
+            awscli \
+            && rm -rf /var/cache/apk/*
             apk add --update ansible
             apk add --update tar gzip curl
             apk add --update openssh-client
             apk add --update nodejs npm
+            pip install awscli
       - run:
           name: Deploy backend
           command: |
@@ -313,7 +316,7 @@ jobs:
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
-            ansible-playbook -i inventory.txt deploy-backend.yml
+            ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory.txt deploy-backend.yml -vv
       - destroy_environment
 
       # Here's where you will add some code to rollback on failure
