@@ -352,7 +352,7 @@ jobs:
             else
                 return 1
             fi
-      - destroy-environmen
+      - destroy_environment
 workflows:
   defaults:
     jobs:
