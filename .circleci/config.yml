@@ -327,7 +327,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update curl node npm
+            apk add --update curl
             pip install awscli
       - run:
           name: Backend smoke test.
@@ -360,7 +360,7 @@ jobs:
 workflows:
   defaults:
     jobs:
-      - build-frontend
+      # - build-frontend
       # - build-backend
       # - test-frontend:
       #     requires: [build-frontend]
