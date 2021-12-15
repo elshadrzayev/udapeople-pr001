@@ -76,13 +76,16 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-build]
+          keys: [frontend-test]
       - run:
           name: test front-end
           command: |
             cd frontend
             npm install
             npm run test
+      - save_cache:
+          paths: [frontend/node_modules]
+          key: frontend-test
       - notify_slack_error
       - notify_slack_pass
 
@@ -92,13 +95,16 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-build]
+          keys: [backend-test]
       - run:
           name: test back-end
           command: |
             cd backend
             npm install
             npm run test
+      - save_cache:
+          paths: [backend/node_modules]
+          key: backend-test
       - notify_slack_error
       - notify_slack_pass
 
@@ -108,13 +114,16 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-build]
+          keys: [frontend-scan]
       - run:
           name: Scan front-end dependencies
           command: |
             cd frontend
             npm install
             npm audit fix --audit-level=critical
+      - save_cache:
+          paths: [frontend/node_modules]
+          key: frontend-scan
       - notify_slack_error
       - notify_slack_pass
 
@@ -124,13 +133,16 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-build]
+          keys: [backend-scan]
       - run:
           name: Scan back-end depedencies
           command: |
             cd backend
             npm install
             npm audit fix --audit-level=critical
+      - save_cache:
+          paths: [backend/node_modules]
+          key: backend-scan
       - notify_slack_error
       - notify_slack_pass
 
@@ -230,12 +242,12 @@ jobs:
           command: |
             if grep -q "has been executed successfully."~/project/backend/migrations_dump.txt
             then
-              curl -H "Content-Type: text/plain" -H "token: d294b23f-6cfd-421d-b775-0fd4b70ea577" --request PUT --data "1" https://api.memstash.io/values/migrations_${CIRCLE_WORKFLOW_ID:0:7}
+              curl -H "Content-Type: text/plain" -H "${CIRCLE_WORKFLOW_ID}" --request PUT --data "1" https://api.memstash.io/values/migrations_${CIRCLE_WORKFLOW_ID:0:7}
             fi
       - persist_to_workspace:
           root: ~/project
           paths:
-            - backend/.env
+            - backend
   deploy-frontend:
     docker:
       - image: amazon/aws-cli
@@ -271,6 +283,41 @@ jobs:
       # Here's where you will add some code to rollback on failure
       - destroy_environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+  deploy-backend:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["9d:a5:72:31:36:41:27:bb:18:29:a3:0b:d5:cd:f2:e5"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+            apk add --update tar gzip curl
+            apk add --update openssh-client
+            apk add --update nodejs npm
+      - run:
+          name: Deploy backend
+          command: |
+            cd backend
+            npm i
+            npm run build
+            cd ..
+      - run:
+          name: Directory zipping
+          command: |
+            # Zip the directory
+            tar -C backend -czvf artifact.tar.gz .
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
+      - destroy_environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      # Here's where you will add some code to rollback on failure
 workflows:
   defaults:
     jobs:
@@ -291,4 +338,6 @@ workflows:
       - run-migrations:
           requires: [configure-infrastructure]
       - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
           requires: [run-migrations]
