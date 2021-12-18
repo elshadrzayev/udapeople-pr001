@@ -3,6 +3,6 @@ github url[URL001]:
 https://github.com/elshadrzayev/udapeople-pr001.git
 
 s3 url[URL002]:
-
+http://udapeople-1a00a68.s3-website-us-east-1.amazonaws.com/
 
 
