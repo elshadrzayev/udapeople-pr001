@@ -4,4 +4,8 @@ https://github.com/elshadrzayev/udapeople-pr001.git
 
 s3 url[URL002]:
 
+http://udapeople-135de0f.s3-website-us-east-1.amazonaws.com
+
+
+
 
